@@ -1,10 +1,14 @@
 package cmd
 
 import (
-	"cloud.google.com/go/compute/apiv1/computepb"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"cloud.google.com/go/compute/apiv1/computepb"
 	"github.com/loft-sh/devpod-provider-gcloud/pkg/gcloud"
 	"github.com/loft-sh/devpod-provider-gcloud/pkg/options"
 	"github.com/loft-sh/devpod-provider-gcloud/pkg/ptr"
@@ -12,9 +16,6 @@ import (
 	"github.com/loft-sh/devpod/pkg/ssh"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 // CreateCmd holds the cmd flags
@@ -94,6 +95,9 @@ func buildInstance(options *options.Options) (*computepb.Instance, error) {
 					SourceImage: ptr.Ptr(options.DiskImage),
 				},
 			},
+		},
+		Scheduling: &computepb.Scheduling{
+			Preemptible: ptr.Ptr(true),
 		},
 		Tags: buildInstanceTags(options),
 		NetworkInterfaces: []*computepb.NetworkInterface{
